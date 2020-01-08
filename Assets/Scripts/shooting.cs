@@ -17,7 +17,6 @@ public class shooting : MonoBehaviour
         //kiedy naciskamy przycisk myszki
         if (Input.GetButtonDown("Fire1"))
         {
-            Time.timeScale = 0.05f;
             Shoot();
         }
     }

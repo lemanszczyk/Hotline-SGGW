@@ -20,6 +20,9 @@ public class NexScene : MonoBehaviour
     }
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        EditorSceneManager.LoadScene(id_scen);
+        if (collision.GetComponent<Collider2D>() == player)
+        {
+            EditorSceneManager.LoadScene(id_scen);
+        }
     }
 }
