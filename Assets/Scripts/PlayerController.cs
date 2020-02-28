@@ -69,6 +69,10 @@ public class PlayerController : MonoBehaviour
         rb.velocity = new Vector2(velX, velY);
     }
 
+    private void Awake()
+    {
+        
+    }
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();

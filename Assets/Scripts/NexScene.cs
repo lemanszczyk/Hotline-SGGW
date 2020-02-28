@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEditor.SceneManagement;
 
 public class NexScene : MonoBehaviour
 {
@@ -22,7 +21,7 @@ public class NexScene : MonoBehaviour
     {
         if (collision.GetComponent<Collider2D>() == player)
         {
-            EditorSceneManager.LoadScene(id_scen);
+            UnityEngine.SceneManagement.SceneManager.LoadScene(id_scen);
         }
     }
 }
