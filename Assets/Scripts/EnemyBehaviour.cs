@@ -17,23 +17,30 @@ public class EnemyBehaviour : MonoBehaviour
     public float RotationSpeed = 10;
     
     public int nearestStartPoint = 0;
-    int pointRightNow = -1;
+    int pointRightNow = 0;
     
     Vector3 startPos;
     Vector3 startRot;
+    int startPoint;
 
     int LastSeenArea = 0;
+    int nextPoint;
 
     float fireCooldown = 0;
     float searchCooldown = 0;
 
     int state = 100; //100 = idle, 101 = canattack
 
+    Vector3 nextPointPos;
+    Vector3 direction;
+    float distance;
+
     void Start()
     {
         Player = GameObject.Find("Player").transform;
         startPos = transform.position;
         startRot = transform.eulerAngles;
+        startPoint = pointRightNow;
     }
 
     // Update is called once per frame
@@ -47,12 +54,21 @@ public class EnemyBehaviour : MonoBehaviour
         if (searchCooldown > 0)
         {
             Goto(LastSeenArea);
+            return;
+        }
+        if (startPoint != pointRightNow)
+        {
+            Goto(startPoint, true);
         }
     }
 
-    void Goto(int area)
+    void Goto(int area, bool PointNotArea = false)
     {
         int pointTarget = AIpointsConnect.areaToPoint[area];
+        if (PointNotArea)
+        {
+            pointTarget = area;
+        }
         if (pointRightNow == pointTarget)
         {
             if (searchCooldown > 0)
@@ -64,13 +80,45 @@ public class EnemyBehaviour : MonoBehaviour
             {
                 transform.eulerAngles = startRot;
                 transform.position = startPos;
+                pointRightNow = startPoint;
                 return;
             }
         }
         if (pointRightNow != -1)
         {
-            
+            Debug.Log((new int[] { pointRightNow, pointTarget })[1]);
+            nextPoint = AIpointsConnect.Road[new int[] { pointRightNow, pointTarget }];
+            nextPointPos = AIpointsConnect.Points[nextPoint].position;
+            direction = nextPointPos - transform.position;
+            transform.up = direction.normalized;
+
+            distance = Time.deltaTime * WalkSpeed;
+            if (direction.magnitude <= distance)
+            {
+                transform.position = nextPointPos;
+                pointRightNow = nextPoint;
+            }
+            else
+            {
+                transform.position += direction.normalized * distance;
+            }
+            return;
         }
+        nextPointPos = AIpointsConnect.Points[nextPoint].position;
+        direction = nextPointPos - transform.position;
+        transform.up = direction.normalized;
+
+        distance = Time.deltaTime * WalkSpeed;
+        if (direction.magnitude <= distance)
+        {
+            transform.position = nextPointPos;
+            pointRightNow = nextPoint;
+        }
+        else
+        {
+            transform.position += direction.normalized * distance;
+        }
+
     }
 
     void CooldownUpdate()
