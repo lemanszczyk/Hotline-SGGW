@@ -86,8 +86,7 @@ public class EnemyBehaviour : MonoBehaviour
         }
         if (pointRightNow != -1)
         {
-            Debug.Log((new int[] { pointRightNow, pointTarget })[1]);
-            nextPoint = AIpointsConnect.Road[new int[] { pointRightNow, pointTarget }];
+            nextPoint = AIpointsConnect.Road["" + pointRightNow + "," + pointTarget ];
             nextPointPos = AIpointsConnect.Points[nextPoint].position;
             direction = nextPointPos - transform.position;
             transform.up = direction.normalized;
@@ -101,6 +100,8 @@ public class EnemyBehaviour : MonoBehaviour
             else
             {
                 transform.position += direction.normalized * distance;
+                pointRightNow = -1;
+
             }
             return;
         }
@@ -117,6 +118,7 @@ public class EnemyBehaviour : MonoBehaviour
         else
         {
             transform.position += direction.normalized * distance;
+            pointRightNow = -1;
         }
 
     }
@@ -176,5 +178,11 @@ public class EnemyBehaviour : MonoBehaviour
             }
         }
         return false;
+    }
+
+    public void InformEnemy()
+    {
+        searchCooldown = SearchCooldown;
+        LastSeenArea = PlayerPosContainer.areaNumber;
     }
 }

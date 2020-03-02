@@ -25,7 +25,7 @@ public class shooting : MonoBehaviour
     void Update()
     {
         //kiedy naciskamy przycisk myszki
-        if (Input.GetButtonDown("Fire1"))
+        if (Input.GetButtonDown("Fire1") && !PauseMenu.GameIsPause)
         {
             Shoot();
             StartCoroutine(AlarmEnemies());
@@ -49,7 +49,7 @@ public class shooting : MonoBehaviour
         {
             if (Vector2.Distance(transform.position, Enemies[i].transform.position) <= SoundRange)
             {
-                Debug.Log("ALARM!");
+                Enemies[i].GetComponent<EnemyBehaviour>().InformEnemy();
             }
         }
     }

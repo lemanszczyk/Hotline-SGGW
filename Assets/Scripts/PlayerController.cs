@@ -80,7 +80,10 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        RotateDisplayToMouse();
+        if (!PauseMenu.GameIsPause)
+        {
+            RotateDisplayToMouse();
+        }
     }
     void FixedUpdate()
     {
