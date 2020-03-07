@@ -17,7 +17,7 @@ public class EnemyBehaviour : MonoBehaviour
     public float RotationSpeed = 10;
     
     public int nearestStartPoint = 0;
-    int pointRightNow = 0;
+    public int pointRightNow = 0;
     
     Vector3 startPos;
     Vector3 startRot;
@@ -26,12 +26,10 @@ public class EnemyBehaviour : MonoBehaviour
     int[] betweenPoints;
 
     int LastSeenArea = 0;
-    public int nextPoint;
+    int nextPoint;
 
     float fireCooldown = 0;
     float searchCooldown = 0;
-
-    int state = 100; //100 = idle, 101 = canattack
 
     Vector3 nextPointPos;
     Vector3 direction;
@@ -63,15 +61,23 @@ public class EnemyBehaviour : MonoBehaviour
         if (startPoint != pointRightNow)
         {
             Goto(startPoint, true);
+            return;
         }
+        transform.eulerAngles = startRot;
+        transform.position = startPos;
+        pointRightNow = startPoint;
     }
 
     void Goto(int area, bool PointNotArea = false)
     {
-        int pointTarget = AIpointsConnect.areaToPoint[area];
+        int pointTarget;
         if (PointNotArea)
         {
             pointTarget = area;
+        }
+        else
+        {
+            pointTarget = AIpointsConnect.areaToPoint[area];
         }
         if (pointRightNow == pointTarget)
         {
