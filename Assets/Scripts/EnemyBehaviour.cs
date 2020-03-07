@@ -23,8 +23,10 @@ public class EnemyBehaviour : MonoBehaviour
     Vector3 startRot;
     int startPoint;
 
+    int[] betweenPoints;
+
     int LastSeenArea = 0;
-    int nextPoint;
+    public int nextPoint;
 
     float fireCooldown = 0;
     float searchCooldown = 0;
@@ -34,6 +36,7 @@ public class EnemyBehaviour : MonoBehaviour
     Vector3 nextPointPos;
     Vector3 direction;
     float distance;
+    
 
     void Start()
     {
@@ -41,6 +44,7 @@ public class EnemyBehaviour : MonoBehaviour
         startPos = transform.position;
         startRot = transform.eulerAngles;
         startPoint = pointRightNow;
+        betweenPoints = new int[] { startPoint, startPoint };
     }
 
     // Update is called once per frame
@@ -71,6 +75,7 @@ public class EnemyBehaviour : MonoBehaviour
         }
         if (pointRightNow == pointTarget)
         {
+            betweenPoints = new int[] { pointRightNow, pointRightNow };
             if (searchCooldown > 0)
             {
                 transform.eulerAngles = new Vector3(0, 0, transform.eulerAngles.z + RotationSpeed * Time.deltaTime);
@@ -86,7 +91,7 @@ public class EnemyBehaviour : MonoBehaviour
         }
         if (pointRightNow != -1)
         {
-            nextPoint = AIpointsConnect.Road["" + pointRightNow + "," + pointTarget ];
+            nextPoint = AIpointsConnect.Road["" + pointRightNow + "," + pointTarget ][0];
             nextPointPos = AIpointsConnect.Points[nextPoint].position;
             direction = nextPointPos - transform.position;
             transform.up = direction.normalized;
@@ -96,15 +101,37 @@ public class EnemyBehaviour : MonoBehaviour
             {
                 transform.position = nextPointPos;
                 pointRightNow = nextPoint;
+                betweenPoints = new int[] { pointRightNow, pointRightNow };
             }
             else
             {
                 transform.position += direction.normalized * distance;
+                betweenPoints = new int[] { pointRightNow, nextPoint };
                 pointRightNow = -1;
-
             }
             return;
         }
+        if (betweenPoints[1] != pointTarget && betweenPoints[0] != pointTarget)
+        {
+            if (AIpointsConnect.Road["" + betweenPoints[0] + "," + pointTarget].Length
+            > AIpointsConnect.Road["" + betweenPoints[1] + "," + pointTarget].Length)
+            {
+                nextPoint = betweenPoints[1];
+            }
+            else
+            {
+                nextPoint = betweenPoints[0];
+            }
+        }
+        if (betweenPoints[1] == pointTarget)
+        {
+            nextPoint = betweenPoints[1];
+        }
+        else if(betweenPoints[0] == pointTarget)
+        {
+            nextPoint = betweenPoints[0];
+        }
+
         nextPointPos = AIpointsConnect.Points[nextPoint].position;
         direction = nextPointPos - transform.position;
         transform.up = direction.normalized;
@@ -114,6 +141,7 @@ public class EnemyBehaviour : MonoBehaviour
         {
             transform.position = nextPointPos;
             pointRightNow = nextPoint;
+            betweenPoints = new int[] { pointRightNow, pointRightNow };
         }
         else
         {
