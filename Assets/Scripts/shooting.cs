@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
 public class shooting : MonoBehaviour
 {
     //z którego miejsca strzelać
@@ -14,16 +15,30 @@ public class shooting : MonoBehaviour
 
     public float SoundRange = 10;
 
+    public int maxAmmo = 3;
+    private int currentAmmo;
+    public float reloadTime = 1f;
+    private bool isReloading = false;
+
     GameObject[] Enemies;
 
     void Start()
     {
+        currentAmmo = maxAmmo;
         Enemies = GameObject.FindGameObjectsWithTag("Enemy");
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (isReloading)
+            return;
+
+        if (currentAmmo <= 0)
+        {
+            StartCoroutine(Reload());
+            return;
+        } 
         //kiedy naciskamy przycisk myszki
         if (Input.GetButtonDown("Fire1") && !PauseMenu.GameIsPause)
         {
@@ -31,9 +46,20 @@ public class shooting : MonoBehaviour
             StartCoroutine(AlarmEnemies());
         }
     }
+    
+    IEnumerator Reload()
+    {
+        isReloading = true;
+        Debug.Log("reload");
+        yield return new WaitForSeconds(reloadTime);
+
+        currentAmmo = maxAmmo;
+        isReloading = false;
+    }
     //podczas stzelania
     void Shoot()
     {
+        currentAmmo--;
         //tworzenie pocisku
         GameObject bullet = Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
         //Debug.Log(firePoint.rotation);

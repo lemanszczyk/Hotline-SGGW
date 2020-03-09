@@ -34,13 +34,17 @@ public class EnemyBehaviour : MonoBehaviour
     Vector3 nextPointPos;
     Vector3 direction;
     float distance;
-    
+
+    Transform Display;
+    Rigidbody2D rb;
 
     void Start()
     {
         Player = GameObject.Find("Player").transform;
+        Display = transform.GetChild(0);
+        rb = gameObject.GetComponent<Rigidbody2D>();
         startPos = transform.position;
-        startRot = transform.eulerAngles;
+        startRot = Display.eulerAngles;
         startPoint = pointRightNow;
         betweenPoints = new int[] { startPoint, startPoint };
     }
@@ -82,6 +86,7 @@ public class EnemyBehaviour : MonoBehaviour
         if (pointRightNow == pointTarget)
         {
             betweenPoints = new int[] { pointRightNow, pointRightNow };
+            rb.velocity = Vector2.zero;
             if (searchCooldown > 0)
             {
                 transform.eulerAngles = new Vector3(0, 0, transform.eulerAngles.z + RotationSpeed * Time.deltaTime);
@@ -100,18 +105,20 @@ public class EnemyBehaviour : MonoBehaviour
             nextPoint = AIpointsConnect.Road["" + pointRightNow + "," + pointTarget ][0];
             nextPointPos = AIpointsConnect.Points[nextPoint].position;
             direction = nextPointPos - transform.position;
-            transform.up = direction.normalized;
+            Display.up = direction.normalized;
 
             distance = Time.deltaTime * WalkSpeed;
             if (direction.magnitude <= distance)
             {
+                rb.velocity = Vector2.zero;
                 transform.position = nextPointPos;
                 pointRightNow = nextPoint;
                 betweenPoints = new int[] { pointRightNow, pointRightNow };
             }
             else
             {
-                transform.position += direction.normalized * distance;
+                rb.velocity = direction.normalized * WalkSpeed;
+                //transform.position += direction.normalized * distance;
                 betweenPoints = new int[] { pointRightNow, nextPoint };
                 pointRightNow = -1;
             }
@@ -140,18 +147,20 @@ public class EnemyBehaviour : MonoBehaviour
 
         nextPointPos = AIpointsConnect.Points[nextPoint].position;
         direction = nextPointPos - transform.position;
-        transform.up = direction.normalized;
+        Display.up = direction.normalized;
 
         distance = Time.deltaTime * WalkSpeed;
         if (direction.magnitude <= distance)
         {
+            rb.velocity = Vector2.zero;
             transform.position = nextPointPos;
             pointRightNow = nextPoint;
             betweenPoints = new int[] { pointRightNow, pointRightNow };
         }
         else
         {
-            transform.position += direction.normalized * distance;
+            rb.velocity = direction.normalized * WalkSpeed;
+            //transform.position += direction.normalized * distance;
             pointRightNow = -1;
         }
 
@@ -179,7 +188,7 @@ public class EnemyBehaviour : MonoBehaviour
             return false;
         }
         Vector3 DiffrenceNorm = Diffrence.normalized;
-        float angle = Vector3.Angle(DiffrenceNorm, transform.up);
+        float angle = Vector3.Angle(DiffrenceNorm, Display.up);
         if (angle < 180 - LookAngle)
         {
             return false;
@@ -189,14 +198,15 @@ public class EnemyBehaviour : MonoBehaviour
         {
             if (hit.collider.name == "Player")
             {
+                rb.velocity = Vector2.zero;
                 angle = Vector3.Angle(Diffrence, Vector3.down);
                 if (Player.position.x < transform.position.x)
                 {
-                    transform.eulerAngles = new Vector3(0, 0, angle);
+                    Display.eulerAngles = new Vector3(0, 0, angle);
                 }
                 else
                 {
-                    transform.eulerAngles = new Vector3(0, 0, 360 - angle);
+                    Display.eulerAngles = new Vector3(0, 0, 360 - angle);
                 }
 
                 if (fireCooldown <= 0)
